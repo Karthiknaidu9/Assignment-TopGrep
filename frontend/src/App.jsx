@@ -13,32 +13,31 @@ const App = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await fetch("http://localhost:5000/tasks"); // Replace with your backend URL
+        const response = await fetch("http://localhost:5000/tasks");
         if (response.ok) {
           const data = await response.json();
-          setTasks(data); // Set tasks to fetched data
+          setTasks(data);
         } else {
           console.error("Failed to fetch tasks");
-          setTasks([]); // Set tasks to empty array if the fetch fails
+          setTasks([]);
         }
       } catch (error) {
         console.error("Error fetching tasks:", error);
-        setTasks([]); // Set tasks to empty array if there's an error
+        setTasks([]);
       }
     };
 
     fetchTasks();
-  }, []); // Runs only once when the component mounts
+  }, []);
 
   const handleDelete = async (taskIndex, taskId) => {
     try {
-      // Delete task from backend
       const response = await fetch(`http://localhost:5000/tasks/${taskId}`, {
         method: "DELETE",
       });
-
+      console.log(taskId);
+      console.log("working");
       if (response.ok) {
-        // Remove the task locally
         const newTasks = tasks.filter((_, index) => index !== taskIndex);
         setTasks(newTasks);
       } else {
@@ -46,6 +45,32 @@ const App = () => {
       }
     } catch (error) {
       console.error("Error deleting task:", error);
+    }
+  };
+
+  const handleEdit = async (taskIndex, updatedTask) => {
+    try {
+      const taskId = tasks[taskIndex]._id;
+
+      const response = await fetch(`http://localhost:5000/tasks/${taskId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ task: updatedTask }),
+      });
+
+      if (response.ok) {
+        setTasks((prevTasks) =>
+          prevTasks.map((task, index) =>
+            index === taskIndex ? { ...task, task: updatedTask } : task
+          )
+        );
+      } else {
+        console.error("Failed to update task");
+      }
+    } catch (error) {
+      console.error("Error updating task:", error);
     }
   };
 
@@ -59,6 +84,7 @@ const App = () => {
           tasks={tasks}
           status="todo"
           handleDelete={handleDelete}
+          handleEdit={handleEdit}
         />
         <TaskColumn
           title="Doing"
@@ -66,6 +92,7 @@ const App = () => {
           tasks={tasks}
           status="doing"
           handleDelete={handleDelete}
+          handleEdit={handleEdit}
         />
         <TaskColumn
           title="Done"
@@ -73,6 +100,7 @@ const App = () => {
           tasks={tasks}
           status="done"
           handleDelete={handleDelete}
+          handleEdit={handleEdit}
         />
       </main>
     </div>

@@ -5,19 +5,16 @@ const cors = require("cors");
 
 const app = express();
 
-// Middleware
 app.use(bodyParser.json());
 app.use(cors());
 
-// MongoDB Connection
 const MONGO_URI =
-  "mongodb+srv://karthiknaidukonchada35:oAwXMiFpPGg9axb0@cluster0.fvqab.mongodb.net/todo_app"; // Replace with your MongoDB URI
+  "mongodb+srv://karthiknaidukonchada35:oAwXMiFpPGg9axb0@cluster0.fvqab.mongodb.net/todo_app";
 mongoose
   .connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.log("MongoDB connection error:", err));
 
-// Task Schema
 const taskSchema = new mongoose.Schema({
   task: { type: String, required: true },
   status: { type: String, enum: ["todo", "doing", "done"], default: "todo" },
@@ -25,9 +22,6 @@ const taskSchema = new mongoose.Schema({
 
 const Task = mongoose.model("Task", taskSchema);
 
-// Routes
-
-// Get all tasks
 app.get("/tasks", async (req, res) => {
   try {
     const tasks = await Task.find();
@@ -37,7 +31,6 @@ app.get("/tasks", async (req, res) => {
   }
 });
 
-// Add a new task
 app.post("/tasks", async (req, res) => {
   try {
     const { task, status } = req.body;
@@ -55,7 +48,6 @@ app.post("/tasks", async (req, res) => {
   }
 });
 
-// Update a task
 app.put("/tasks/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -77,11 +69,10 @@ app.put("/tasks/:id", async (req, res) => {
   }
 });
 
-// Delete a task
-app.delete("/tasks/:id", async (req, res) => {
+app.delete("/tasks/id", async (req, res) => {
   try {
     const { id } = req.params;
-
+    console.log(id);
     const deletedTask = await Task.findByIdAndDelete(id);
 
     if (!deletedTask) {
@@ -94,7 +85,6 @@ app.delete("/tasks/:id", async (req, res) => {
   }
 });
 
-// Start the server
 const PORT = 5000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
